@@ -9,3 +9,5 @@ clean:
 run: clean
 	scrapy crawl webmotors -a force_last_page=$(PAGES) --logfile=webmotors.log
 
+install:
+	pip install -r requirements.txt

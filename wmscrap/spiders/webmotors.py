@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import scrapy
 
+from wmscrap.items import CarItem
+
 
 class WebmotorsSpider(scrapy.Spider):
     name = "webmotors"
@@ -12,10 +14,15 @@ class WebmotorsSpider(scrapy.Spider):
         '&estado1=veiculos-todos-estados&o=1&p={}'
     )
 
-    def __init__(self):
+    def __init__(self, force_last_page=None):
+        # Paramether force_last_page
+        if force_last_page:
+            self.force_last_page = int(force_last_page)
+
         self.last_page = None
 
     def start_requests(self):
+        """Create request to first page"""
         request = scrapy.Request(
             url=WebmotorsSpider.first_page_url.format(1),
             callback=self.parse_page,
@@ -23,6 +30,10 @@ class WebmotorsSpider(scrapy.Spider):
         yield request
 
     def parse_page(self, response):
+        """
+        Create requests to links of all pages and
+        set the last page
+        """
         # get anchor link on "last page" button
         last_button_anchor = response.xpath(
             '//*[contains(@id, "boxResultado")]'
@@ -31,21 +42,50 @@ class WebmotorsSpider(scrapy.Spider):
         # get the last page from href
         self.last_page = int(last_button_anchor.split("p=")[-1])
 
+        if self.force_last_page:
+            self.last_page = self.force_last_page
+
         for page in range(1, self.last_page):
             request = scrapy.Request(
-                url=WebmotorsSpider.first_page_url.format(page),
+                url=WebmotorsSpider.first_page_url.format(self.last_page),
                 callback=self.parse_car_link,
             )
             yield request
 
     def parse_car_link(self, response):
+        """Create request to car detail description"""
+
+        # filter links of car detail description
         results = response.xpath(
             '//*[contains(@id, "boxResultado")]'
             '/a/@href')
 
-        for number, car in enumerate(results, 1):
-            print("{}. {}".format(number, car.extract()))
+        for car_link in results:
+            url_detail_description = car_link.extract()
+            request = scrapy.Request(
+                url=url_detail_description,
+                callback=self.parse_car_detail_description,
+            )
+            yield request
 
-        print("-----")
-        print(response.url)
-        print("-----")
+    def parse_car_detail_description(self, response):
+        makemodel_class = response.xpath(
+            '//*[contains(@class,"makemodel")]'
+            '/text()').extract_first()
+
+        try:
+            makemodel_class = makemodel_class.split()
+            brand = makemodel_class[0]
+            model = " ".join(makemodel_class[1:])
+        except ValueError as e:
+            print("URL {}, error : {}".format(response.url, e))
+            return
+        except Exception as e:
+            print("URL {}, generic error : {}".format(response.url, e))
+            return
+
+        # Create car item
+        car = CarItem()
+        car['brand'] = brand
+        car['model'] = model
+        yield car

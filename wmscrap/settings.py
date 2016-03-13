@@ -61,9 +61,11 @@ NEWSPIDER_MODULE = 'wmscrap.spiders'
 
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'wmscrap.pipelines.SomePipeline': 300,
-#}
+ITEM_PIPELINES = {
+    'wmscrap.pipelines.RedisExportPipeline': 200,
+    'wmscrap.pipelines.JsonExportPipeline': 300,
+    'wmscrap.pipelines.CsvExportPipeline': 400,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
-
+from unicodedata import normalize
 from wmscrap.items import CarItem
 
 
@@ -68,6 +68,9 @@ class WebmotorsSpider(scrapy.Spider):
             )
             yield request
 
+    def remove_accents(txt, codif='utf-8'):
+        return normalize('NFKD', txt.decode(codif)).encode('ASCII', 'ignore')
+
     def parse_car_detail_description(self, response):
         makemodel_class = response.xpath(
             '//*[contains(@class,"makemodel")]'
@@ -75,8 +78,12 @@ class WebmotorsSpider(scrapy.Spider):
 
         try:
             makemodel_class = makemodel_class.split()
+            # brand = self.remove_accents(makemodel_class[0])
             brand = makemodel_class[0]
+            # model = self.remove_accents(" ".join(makemodel_class[1:]))
             model = " ".join(makemodel_class[1:])
+            model = self.remove_accents(str(model))
+            print(model)
         except ValueError as e:
             print("URL {}, error : {}".format(response.url, e))
             return

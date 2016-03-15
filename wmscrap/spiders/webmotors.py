@@ -74,11 +74,13 @@ class WebmotorsSpider(scrapy.Spider):
     def parse_car_detail_description(self, response):
         makemodel_class = response.xpath(
             '//*[contains(@class,"makemodel")]'
-            '/text()').extract_first()
+            '/text()').extract()
+        # join items of list and clear
+        makemodel_class = ''.join(makemodel_class).strip()
 
         try:
-            makemodel_class = makemodel_class.split()
             if len(makemodel_class):
+                makemodel_class = makemodel_class.split()
                 brand = makemodel_class[0]
                 model = " ".join(makemodel_class[1:])
         except ValueError as e:

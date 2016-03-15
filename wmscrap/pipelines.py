@@ -100,7 +100,7 @@ class RedisExportPipeline(object):
 
     def process_item(self, item, spider):
         hkey = (
-            "{}-{}".format(
+            u"{}-{}".format(
                 item['model'],
                 item['brand'])
         )

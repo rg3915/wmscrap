@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import scrapy
-from unicodedata import normalize
 from wmscrap.items import CarItem
 
 
@@ -9,9 +8,9 @@ class WebmotorsSpider(scrapy.Spider):
     allowed_domains = ["webmotors.com.br"]
     first_page_url = (
         'http://www.webmotors.com.br/comprar/carros/novos-usados/'
-        'veiculos-todos-estados/?tipoveiculo=carros'
-        '&tipoanuncio=novos%7Cusados'
-        '&estado1=veiculos-todos-estados&o=1&p={}'
+        'veiculos-todos-estados/?tipoveiculo=carros&tipoanuncio'
+        '=novos%7Cusados&palavrachave=megane&estado1=veiculos-todos-estados'
+        '&qt=12&o=1&p={}'
     )
 
     def __init__(self, force_last_page=None):
@@ -27,6 +26,9 @@ class WebmotorsSpider(scrapy.Spider):
             url=WebmotorsSpider.first_page_url.format(1),
             callback=self.parse_page,
         )
+        # print("Request:", request)
+        # print("*** url: ***", request.url)
+        # print("*** callback: ***", request.callback)
         yield request
 
     def parse_page(self, response):
@@ -48,50 +50,15 @@ class WebmotorsSpider(scrapy.Spider):
         for page in range(1, self.last_page):
             request = scrapy.Request(
                 url=WebmotorsSpider.first_page_url.format(self.last_page),
-                callback=self.parse_car_link,
+                # callback=self.parse_car_link,
             )
+            print("Request:", request)
+            print("*** url: ***", request.url)
+            # print("*** callback: ***", request.callback)
             yield request
 
-    def parse_car_link(self, response):
-        """Create request to car detail description"""
-
-        # filter links of car detail description
-        results = response.xpath(
-            '//*[contains(@id, "boxResultado")]'
-            '/a/@href')
-
-        for car_link in results:
-            url_detail_description = car_link.extract()
-            request = scrapy.Request(
-                url=url_detail_description,
-                callback=self.parse_car_detail_description,
-            )
-            yield request
-
-    def remove_accents(txt, codif='utf-8'):
-        return normalize('NFKD', txt.decode(codif)).encode('ASCII', 'ignore')
-
-    def parse_car_detail_description(self, response):
-        makemodel_class = response.xpath(
-            '//*[contains(@class,"makemodel")]'
-            '/text()').extract()
-        # join items of list and clear
-        makemodel_class = ''.join(makemodel_class).strip()
-
-        try:
-            if len(makemodel_class):
-                makemodel_class = makemodel_class.split()
-                brand = makemodel_class[0]
-                model = " ".join(makemodel_class[1:])
-        except ValueError as e:
-            print("URL {}, error : {}".format(response.url, e))
-            return
-        except Exception as e:
-            print("URL {}, generic error : {}".format(response.url, e))
-            return
-
-        # Create car item
-        car = CarItem()
-        car['brand'] = brand
-        car['model'] = model
-        yield car
+        # # Create car item
+        # car = CarItem()
+        # car['brand'] = brand
+        # car['model'] = model
+        # yield car

@@ -78,12 +78,9 @@ class WebmotorsSpider(scrapy.Spider):
 
         try:
             makemodel_class = makemodel_class.split()
-            # brand = self.remove_accents(makemodel_class[0])
-            brand = makemodel_class[0]
-            # model = self.remove_accents(" ".join(makemodel_class[1:]))
-            model = " ".join(makemodel_class[1:])
-            model = self.remove_accents(str(model))
-            print(model)
+            if len(makemodel_class):
+                brand = makemodel_class[0]
+                model = " ".join(makemodel_class[1:])
         except ValueError as e:
             print("URL {}, error : {}".format(response.url, e))
             return

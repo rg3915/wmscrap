@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import scrapy
+from wmscrap.items import CarItem
 
 
 class WebmotorsSpider(scrapy.Spider):
@@ -40,7 +41,7 @@ class WebmotorsSpider(scrapy.Spider):
         self.last_page = int(last_button_anchor.split("p=")[-1])
 
         if self.force_last_page:
-            self.force_last_page = self.force_last_page
+            self.last_page = self.force_last_page
 
         # page 1 to last page
         for page in range(1, self.last_page):
@@ -54,7 +55,13 @@ class WebmotorsSpider(scrapy.Spider):
         # get make and model of car
         results = response.xpath('//*[@class="info"]/h2/span/text()').extract()
 
-        print('---------------')
-        for result in results:
-            print(result)
-        print('---------------')
+        # Create car item
+        model = results
+        car = CarItem()
+        car['model'] = model
+        yield car
+
+        # print('---------------')
+        # for result in results:
+        #     print(result)
+        # print('---------------')

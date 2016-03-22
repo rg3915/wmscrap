@@ -8,7 +8,5 @@
 import scrapy
 
 
-class WmscrapItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+class CarItem(scrapy.Item):
+    model = scrapy.Field()

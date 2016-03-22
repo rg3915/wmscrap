@@ -53,10 +53,19 @@ class WebmotorsSpider(scrapy.Spider):
 
     def parse_car_description(self, response):
         # get make and model of car
-        results = response.xpath('//*[@class="info"]/h2/span/text()').extract()
+        results = response.xpath(
+            '//*[@class="info"]/h2/span[1]/text()').extract()
+
+        try:
+            model = results
+        except ValueError as e:
+            print("URL {}, error: {}".format(response.url, e))
+            return
+        except Exception as e:
+            print("URL {}, generic error: {}".format(response.url, e))
+            return
 
         # Create car item
-        model = results
         car = CarItem()
         car['model'] = model
         yield car

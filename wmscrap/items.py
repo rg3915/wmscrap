@@ -11,3 +11,5 @@ import scrapy
 class CarItem(scrapy.Item):
     model = scrapy.Field()
     brand = scrapy.Field()
+    price = scrapy.Field()
+    image = scrapy.Field()

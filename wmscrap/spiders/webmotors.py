@@ -47,45 +47,78 @@ class WebmotorsSpider(scrapy.Spider):
 
         for page in range(1, self.last_page):
             request = scrapy.Request(
-                url=WebmotorsSpider.first_page_url.format(self.last_page),
-                callback=self.parse_car_link,
+                url=WebmotorsSpider.first_page_url.format(page),
+                callback=self.parse,
             )
             yield request
 
-    def parse_car_link(self, response):
-        """Create request to car detail description"""
+    def parse(self, response):
+        """Parse all information to CarItem"""
 
-        # filter links of car detail description
-        results = response.xpath(
-            '//*[contains(@id, "boxResultado")]'
-            '/a/@href')
+        model_items = response.xpath(
+            '//*[contains(@class,"make-model")]'
+            '/text()').extract()
 
-        for car_link in results:
-            url_detail_description = car_link.extract()
-            request = scrapy.Request(
-                url=url_detail_description,
-                callback=self.parse_car_detail_description,
-            )
-            yield request
+        brands = []
+        models = []
+        for m in model_items:
+            try:
+                model_brand = m.split()
+                brand = model_brand[0]
+                model = " ".join(model_brand[1:])
+                brands.append(brand)
+                models.append(model)
+            except ValueError as e:
+                print("URL {}, error : {}".format(response.url, e))
+                return
+            except Exception as e:
+                print("URL {}, generic error : {}".format(response.url, e))
+                return
 
-    def parse_car_detail_description(self, response):
-        makemodel_class = response.xpath(
-            '//*[contains(@class,"makemodel")]'
-            '/text()').extract_first()
+        prices_items = response.xpath(
+            '//*[contains(@class,"price")]/text()').extract()
 
-        try:
-            makemodel_class = makemodel_class.split()
-            brand = makemodel_class[0]
-            model = " ".join(makemodel_class[1:])
-        except ValueError as e:
-            print("URL {}, error : {}".format(response.url, e))
-            return
-        except Exception as e:
-            print("URL {}, generic error : {}".format(response.url, e))
-            return
+        prices = []
+        for p in prices_items:
+            try:
+                clean_price = p.strip()
+                if clean_price == '':
+                    continue
+                prices.append(clean_price)
+            except ValueError as e:
+                print("URL {}, error : {}".format(response.url, e))
+                return
+            except Exception as e:
+                print("URL {}, generic error : {}".format(response.url, e))
+                return
 
-        # Create car item
-        car = CarItem()
-        car['brand'] = brand
-        car['model'] = model
-        yield car
+        image_tags = response.xpath(
+            '//*[contains(@id, "boxResultado")]//img'
+            '/@data-original').extract()
+
+        images = []
+        for i in image_tags:
+            try:
+                images.append(i)
+            except ValueError as e:
+                print("URL {}, error : {}".format(response.url, e))
+                return
+            except Exception as e:
+                print("URL {}, generic error : {}".format(response.url, e))
+                return
+
+        # If size of lists is not equal something wrong
+        if len(prices) == len(models) == len(brands) == len(images):
+            size = len(prices)
+            for i in range(0, size):
+                car = CarItem()
+                car['brand'] = brands[i]
+                car['model'] = models[i]
+                car['price'] = prices[i]
+                car['image'] = images[i]
+                yield car
+        else:
+            error_message = ("Error with size of lists: prices={}, "
+                             "models={}, brands={}, images={}")
+            print(error_message.format(len(prices), len(models), len(brands),
+                                       len(images)))

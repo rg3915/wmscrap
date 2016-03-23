@@ -87,19 +87,23 @@ class RedisExportPipeline(object):
         start = datetime.now().isoformat(' ')
         self.start_time = time()
         print("Start spider {} at {}".format(spider.name, start))
-        # self.exporter.start_exporting()
 
     def spider_closed(self, spider):
         end = datetime.now().isoformat(' ')
         print("Finish spider {} at {}".format(spider.name, end))
         print("Elapsed time {}".format(time() - self.start_time))
-        # self.exporter.finish_exporting()
 
     def process_item(self, item, spider):
+        # Example: Mégane is a key Mgane
+        key_model = unicode(item['model'].encode('utf-8'), errors='ignore')
+        key_brand = unicode(item['brand'].encode('utf-8'), errors='ignore')
+        key_price = unicode(item['price'].encode('utf-8'), errors='ignore')
+
         hkey = (
-            "{}-{}".format(
-                item['model'],
-                item['brand'])
+            "{}-{}-{}".format(
+                key_model,
+                key_brand,
+                key_price)
         )
         self.dict_to_redis_hset(hkey, item)
         return item

@@ -13,7 +13,7 @@ BOT_NAME = 'wmscrap'
 
 SPIDER_MODULES = ['wmscrap.spiders']
 NEWSPIDER_MODULE = 'wmscrap.spiders'
-
+DUPEFILTER_DEBUG = True
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'wmscrap (+http://www.yourdomain.com)'

@@ -7,7 +7,8 @@ clean:
 	@find . -name "*.log" -type f | xargs rm -rf
 
 run: clean
-	scrapy crawl webmotors -a force_last_page=$(PAGES)
+	redis-server &
+	scrapy crawl webmotors -a force_last_page=$(PAGES) --logfile=webmotors.log
 	
 install:
 	pip install -r requirements.txt

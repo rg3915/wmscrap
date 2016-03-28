@@ -62,6 +62,7 @@ DUPEFILTER_DEBUG = True
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
+    'wmscrap.pipelines.RedisExportPipeline': 200,
     'wmscrap.pipelines.JsonExportPipeline': 300,
     'wmscrap.pipelines.CsvExportPipeline': 400,
 }

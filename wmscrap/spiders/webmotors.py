@@ -7,11 +7,10 @@ class WebmotorsSpider(scrapy.Spider):
     name = "webmotors"
     allowed_domains = ["webmotors.com.br"]
     first_page_url = (
-        'http://www.webmotors.com.br/comprar/carros/usados/'
-        'veiculos-todos-estados/'
-        '?tipoveiculo=carros'
-        '&tipoanuncio=usados'
-        '&estado1=veiculos-todos-estados&qt=12&o=1&p={}'
+        'http://www.webmotors.com.br/comprar/carros/novos-usados/'
+        'veiculos-todos-estados/?tipoveiculo=carros'
+        '&tipoanuncio=novos%7Cusados'
+        '&estado1=veiculos-todos-estados&o=1&p={}'
     )
 
     def __init__(self, force_last_page=None):
@@ -47,13 +46,6 @@ class WebmotorsSpider(scrapy.Spider):
         for page in range(1, self.last_page):
             request = scrapy.Request(
                 url=WebmotorsSpider.first_page_url.format(page),
-<<<<<<< HEAD
-                callback=self.parse_car_description,
-            )
-            yield request
-
-=======
-<<<<<<< HEAD
                 callback=self.parse,
             )
             yield request
@@ -126,38 +118,5 @@ class WebmotorsSpider(scrapy.Spider):
         else:
             error_message = ("Error with size of lists: prices={}, "
                              "models={}, brands={}, images={}")
-            print(error_message.format(len(prices), len(models), len(brands),
-                                       len(images)))
-=======
-                callback=self.parse_car_description,
-            )
-            yield request
-
->>>>>>> rh-only-home-pages
-    def parse_car_description(self, response):
-        # get make and model of car
-        results = response.xpath(
-            '//*[@class="info"]/h2/span[1]/text()').extract()
-
-        try:
-            model = results
-        except ValueError as e:
-            print("URL {}, error: {}".format(response.url, e))
-            return
-        except Exception as e:
-            print("URL {}, generic error: {}".format(response.url, e))
-            return
-
-        # Create car item
-        car = CarItem()
-        car['model'] = model
-        yield car
-
-        # print('---------------')
-        # for result in results:
-        #     print(result)
-        # print('---------------')
-<<<<<<< HEAD
-=======
->>>>>>> master
->>>>>>> rh-only-home-pages
+            print(error_message.format(len(prices), len(
+                models), len(brands), len(images)))

@@ -103,22 +103,10 @@ class RedisExportPipeline(object):
         key_price = unicode(item['price'].encode('utf-8'), errors='ignore')
 
         hkey = (
-<<<<<<< HEAD
-            u"{}".format(
-                item['model']
-            )
-=======
-<<<<<<< HEAD
             "{}-{}-{}".format(
-                key_model,
                 key_brand,
+                key_model,
                 key_price)
-=======
-            u"{}".format(
-                item['model']
-            )
->>>>>>> master
->>>>>>> rh-only-home-pages
         )
         self.dict_to_redis_hset(hkey, item)
         return item

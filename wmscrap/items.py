@@ -10,3 +10,12 @@ import scrapy
 
 class CarItem(scrapy.Item):
     model = scrapy.Field()
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+    brand = scrapy.Field()
+    price = scrapy.Field()
+    image = scrapy.Field()
+=======
+>>>>>>> master
+>>>>>>> rh-only-home-pages

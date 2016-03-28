@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import scrapy
-
 from wmscrap.items import CarItem
 
 
@@ -8,10 +7,11 @@ class WebmotorsSpider(scrapy.Spider):
     name = "webmotors"
     allowed_domains = ["webmotors.com.br"]
     first_page_url = (
-        'http://www.webmotors.com.br/comprar/carros/novos-usados/'
-        'veiculos-todos-estados/?tipoveiculo=carros'
-        '&tipoanuncio=novos%7Cusados'
-        '&estado1=veiculos-todos-estados&o=1&p={}'
+        'http://www.webmotors.com.br/comprar/carros/usados/'
+        'veiculos-todos-estados/'
+        '?tipoveiculo=carros'
+        '&tipoanuncio=usados'
+        '&estado1=veiculos-todos-estados&qt=12&o=1&p={}'
     )
 
     def __init__(self, force_last_page=None):
@@ -22,7 +22,7 @@ class WebmotorsSpider(scrapy.Spider):
         self.last_page = None
 
     def start_requests(self):
-        """Create request to first page"""
+        ''' Create request to first page '''
         request = scrapy.Request(
             url=WebmotorsSpider.first_page_url.format(1),
             callback=self.parse_page,
@@ -30,24 +30,24 @@ class WebmotorsSpider(scrapy.Spider):
         yield request
 
     def parse_page(self, response):
-        """
-        Create requests to links of all pages and
-        set the last page
-        """
+        '''
+        Create requests to links of all pages
+        and set the last page
+        '''
         # get anchor link on "last page" button
         last_button_anchor = response.xpath(
-            '//*[contains(@id, "boxResultado")]'
-            '/div/a/@href')[-1].extract()
-
+            '//*[contains(@id, "boxResultado")]/div/a/@href')[-1].extract()
         # get the last page from href
         self.last_page = int(last_button_anchor.split("p=")[-1])
 
         if self.force_last_page:
             self.last_page = self.force_last_page
 
+        # page 1 to last page
         for page in range(1, self.last_page):
             request = scrapy.Request(
                 url=WebmotorsSpider.first_page_url.format(page),
+<<<<<<< HEAD
                 callback=self.parse,
             )
             yield request
@@ -122,3 +122,32 @@ class WebmotorsSpider(scrapy.Spider):
                              "models={}, brands={}, images={}")
             print(error_message.format(len(prices), len(models), len(brands),
                                        len(images)))
+=======
+                callback=self.parse_car_description,
+            )
+            yield request
+
+    def parse_car_description(self, response):
+        # get make and model of car
+        results = response.xpath(
+            '//*[@class="info"]/h2/span[1]/text()').extract()
+
+        try:
+            model = results
+        except ValueError as e:
+            print("URL {}, error: {}".format(response.url, e))
+            return
+        except Exception as e:
+            print("URL {}, generic error: {}".format(response.url, e))
+            return
+
+        # Create car item
+        car = CarItem()
+        car['model'] = model
+        yield car
+
+        # print('---------------')
+        # for result in results:
+        #     print(result)
+        # print('---------------')
+>>>>>>> master

@@ -10,6 +10,9 @@ import scrapy
 
 class CarItem(scrapy.Item):
     model = scrapy.Field()
+<<<<<<< HEAD
     brand = scrapy.Field()
     price = scrapy.Field()
     image = scrapy.Field()
+=======
+>>>>>>> master

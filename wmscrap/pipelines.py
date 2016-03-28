@@ -13,6 +13,7 @@ from scrapy.exporters import JsonItemExporter, CsvItemExporter
 
 
 class JsonExportPipeline(object):
+
     def __init__(self):
         self.files = {}
 
@@ -40,6 +41,7 @@ class JsonExportPipeline(object):
 
 
 class CsvExportPipeline(object):
+
     def __init__(self):
         self.files = {}
 
@@ -67,6 +69,7 @@ class CsvExportPipeline(object):
 
 
 class RedisExportPipeline(object):
+
     def __init__(self):
         self.redis = redis.StrictRedis(host='localhost')
         self.start_time = None
@@ -100,10 +103,16 @@ class RedisExportPipeline(object):
         key_price = unicode(item['price'].encode('utf-8'), errors='ignore')
 
         hkey = (
+<<<<<<< HEAD
             "{}-{}-{}".format(
                 key_model,
                 key_brand,
                 key_price)
+=======
+            u"{}".format(
+                item['model']
+            )
+>>>>>>> master
         )
         self.dict_to_redis_hset(hkey, item)
         return item

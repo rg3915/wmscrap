@@ -68,19 +68,19 @@ class WebmotorsSpider(scrapy.Spider):
                 print("URL {}, generic error : {}".format(response.url, e))
                 return
 
-        ''' Extract model and brand '''
+        ''' Extract model and maker '''
         model_items = response.xpath(
             '//*[contains(@class,"make-model")]'
             '/text()').extract()
 
-        brands = []
+        makers = []
         models = []
         for m in model_items:
             try:
-                model_brand = m.split()
-                brand = model_brand[0]
-                model = " ".join(model_brand[1:])
-                brands.append(brand)
+                model_maker = m.split()
+                maker = model_maker[0]
+                model = " ".join(model_maker[1:])
+                makers.append(maker)
                 models.append(model)
             except ValueError as e:
                 print("URL {}, error : {}".format(response.url, e))
@@ -139,14 +139,14 @@ class WebmotorsSpider(scrapy.Spider):
                 print("URL {}, generic error : {}".format(response.url, e))
                 return
 
-        ''' Extract yearBrand '''
-        yearbrand_tags = response.xpath(
+        ''' Extract yearMaker '''
+        yearmaker_tags = response.xpath(
             '//*[contains(@class,"features")]/div[1]/span[1]/text()').extract()
 
-        yearbrands = []
-        for yearbrand in yearbrand_tags:
+        yearmakers = []
+        for yearmaker in yearmaker_tags:
             try:
-                yearbrands.append(yearbrand)
+                yearmakers.append(yearmaker)
             except ValueError as e:
                 print("URL {}, error : {}".format(response.url, e))
                 return
@@ -170,23 +170,23 @@ class WebmotorsSpider(scrapy.Spider):
                 return
 
         # If size of lists is not equal something wrong
-        if len(prices) == len(models) == len(brands) == len(images):
+        if len(prices) == len(models) == len(makers) == len(images):
             size = len(prices)
             for i in range(0, size):
                 car = CarItem()
                 car['link'] = links[i]
-                car['brand'] = brands[i]
+                car['maker'] = makers[i]
                 car['model'] = models[i]
                 car['price'] = prices[i]
                 car['image'] = images[i]
                 car['city'] = cities[i]
                 # state
-                car['yearbrand'] = yearbrands[i]
+                car['yearmaker'] = yearmakers[i]
                 # yearModel
                 car['km'] = kms[i]
                 yield car
         else:
             error_message = ("Error with size of lists: prices={}, "
-                             "models={}, brands={}, images={}")
+                             "models={}, makers={}, images={}")
             print(error_message.format(len(prices), len(
-                models), len(brands), len(images)))
+                models), len(makers), len(images)))

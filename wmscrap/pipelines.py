@@ -99,12 +99,12 @@ class RedisExportPipeline(object):
     def process_item(self, item, spider):
         # Example: Mégane is a key Mgane
         key_model = unicode(item['model'].encode('utf-8'), errors='ignore')
-        key_brand = unicode(item['brand'].encode('utf-8'), errors='ignore')
+        key_maker = unicode(item['maker'].encode('utf-8'), errors='ignore')
         key_price = unicode(item['price'].encode('utf-8'), errors='ignore')
 
         hkey = (
             "{}-{}-{}".format(
-                key_brand,
+                key_maker,
                 key_model,
                 key_price)
         )

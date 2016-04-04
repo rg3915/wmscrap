@@ -53,6 +53,24 @@ class WebmotorsSpider(scrapy.Spider):
     def parse(self, response):
         """Parse all information to CarItem"""
 
+        ''' Extract the link '''
+        link_items = response.xpath(
+            '//*[contains(@id, "boxResultado")]/a/@href').extract()
+
+        links = []
+        for l in link_items:
+            try:
+                links.append(l)
+            except ValueError as e:
+                print("URL {}, error : {}".format(response.url, e))
+                return
+            except Exception as e:
+                print("URL {}, generic error : {}".format(response.url, e))
+                return
+
+        print(links, len(links))
+
+        ''' Extract model and brand '''
         model_items = response.xpath(
             '//*[contains(@class,"make-model")]'
             '/text()').extract()
@@ -73,6 +91,7 @@ class WebmotorsSpider(scrapy.Spider):
                 print("URL {}, generic error : {}".format(response.url, e))
                 return
 
+        ''' Extract price '''
         prices_items = response.xpath(
             '//*[contains(@class,"price")]/text()').extract()
 
@@ -90,6 +109,7 @@ class WebmotorsSpider(scrapy.Spider):
                 print("URL {}, generic error : {}".format(response.url, e))
                 return
 
+        ''' Extract image '''
         image_tags = response.xpath(
             '//*[contains(@id, "boxResultado")]//img'
             '/@data-original').extract()
@@ -110,6 +130,7 @@ class WebmotorsSpider(scrapy.Spider):
             size = len(prices)
             for i in range(0, size):
                 car = CarItem()
+                car['link'] = links[i]
                 car['brand'] = brands[i]
                 car['model'] = models[i]
                 car['price'] = prices[i]

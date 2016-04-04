@@ -9,6 +9,7 @@ import scrapy
 
 
 class CarItem(scrapy.Item):
+    link = scrapy.Field()
     model = scrapy.Field()
     brand = scrapy.Field()
     price = scrapy.Field()

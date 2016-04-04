@@ -68,3 +68,6 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+# ignore redis database
+*.rdb

@@ -103,21 +103,6 @@ class WebmotorsSpider(scrapy.Spider):
                 print("URL {}, generic error : {}".format(response.url, e))
                 return
 
-    def scrapy_yearmaker(self, response, yearmakers):
-        ''' Extract yearMaker '''
-        yearmaker_tags = response.xpath(
-            '//*[contains(@class,"features")]/div[1]/span[1]/text()').extract()
-
-        for yearmaker in yearmaker_tags:
-            try:
-                yearmakers.append(yearmaker)
-            except ValueError as e:
-                print("URL {}, error : {}".format(response.url, e))
-                return
-            except Exception as e:
-                print("URL {}, generic error : {}".format(response.url, e))
-                return
-
     def scrapy_image(self, response, images):
         ''' Extract image '''
         image_tags = response.xpath(
@@ -150,6 +135,36 @@ class WebmotorsSpider(scrapy.Spider):
                 print("URL {}, generic error : {}".format(response.url, e))
                 return
 
+    def scrapy_yearmaker(self, response, yearmakers):
+        ''' Extract yearMaker '''
+        yearmaker_tags = response.xpath(
+            '//*[contains(@class,"features")]/div[1]/span[1]/text()').extract()
+
+        for yearmaker in yearmaker_tags:
+            try:
+                yearmakers.append(yearmaker)
+            except ValueError as e:
+                print("URL {}, error : {}".format(response.url, e))
+                return
+            except Exception as e:
+                print("URL {}, generic error : {}".format(response.url, e))
+                return
+
+    def scrapy_km(self, response, kms):
+        ''' Extract Km '''
+        km_tags = response.xpath(
+            '//*[contains(@class,"features")]/div[2]/span[1]/text()').extract()
+
+        for km in km_tags:
+            try:
+                kms.append(km)
+            except ValueError as e:
+                print("URL {}, error : {}".format(response.url, e))
+                return
+            except Exception as e:
+                print("URL {}, generic error : {}".format(response.url, e))
+                return
+
     def parse(self, response):
         """Parse all information to CarItem"""
 
@@ -172,20 +187,8 @@ class WebmotorsSpider(scrapy.Spider):
         yearmakers = []
         self.scrapy_yearmaker(response, yearmakers)
 
-        ''' Extract Km '''
-        km_tags = response.xpath(
-            '//*[contains(@class,"features")]/div[2]/span[1]/text()').extract()
-
         kms = []
-        for km in km_tags:
-            try:
-                kms.append(km)
-            except ValueError as e:
-                print("URL {}, error : {}".format(response.url, e))
-                return
-            except Exception as e:
-                print("URL {}, generic error : {}".format(response.url, e))
-                return
+        self.scrapy_km(response, kms)
 
         # If size of lists is not equal something wrong
         if len(prices) == len(models) == len(makers) == len(images):

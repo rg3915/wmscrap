@@ -14,3 +14,4 @@ class CarItem(scrapy.Item):
     brand = scrapy.Field()
     price = scrapy.Field()
     image = scrapy.Field()
+    city = scrapy.Field()

@@ -65,19 +65,12 @@ class WebmotorsSpider(scrapy.Spider):
                 print("URL {}, generic error : {}".format(response.url, e))
                 return
 
-    def parse(self, response):
-        """Parse all information to CarItem"""
-
-        links = []
-        self.scrapy_link(response, links)
-
+    def scrapy_makermodel(self, response, makers, models):
         ''' Extract model and maker '''
         model_items = response.xpath(
             '//*[contains(@class,"make-model")]'
             '/text()').extract()
 
-        makers = []
-        models = []
         for m in model_items:
             try:
                 model_maker = m.split()
@@ -91,6 +84,16 @@ class WebmotorsSpider(scrapy.Spider):
             except Exception as e:
                 print("URL {}, generic error : {}".format(response.url, e))
                 return
+
+    def parse(self, response):
+        """Parse all information to CarItem"""
+
+        links = []
+        self.scrapy_link(response, links)
+
+        makers = []
+        models = []
+        self.scrapy_makermodel(response, makers, models)
 
         ''' Extract price '''
         prices_items = response.xpath(

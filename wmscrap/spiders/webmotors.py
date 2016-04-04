@@ -154,6 +154,21 @@ class WebmotorsSpider(scrapy.Spider):
                 print("URL {}, generic error : {}".format(response.url, e))
                 return
 
+        ''' Extract Km '''
+        km_tags = response.xpath(
+            '//*[contains(@class,"features")]/div[2]/span[1]/text()').extract()
+
+        kms = []
+        for km in km_tags:
+            try:
+                kms.append(km)
+            except ValueError as e:
+                print("URL {}, error : {}".format(response.url, e))
+                return
+            except Exception as e:
+                print("URL {}, generic error : {}".format(response.url, e))
+                return
+
         # If size of lists is not equal something wrong
         if len(prices) == len(models) == len(brands) == len(images):
             size = len(prices)
@@ -168,7 +183,7 @@ class WebmotorsSpider(scrapy.Spider):
                 # state
                 car['yearbrand'] = yearbrands[i]
                 # yearModel
-                # km
+                car['km'] = kms[i]
                 yield car
         else:
             error_message = ("Error with size of lists: prices={}, "

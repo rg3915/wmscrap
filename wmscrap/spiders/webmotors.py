@@ -50,14 +50,11 @@ class WebmotorsSpider(scrapy.Spider):
             )
             yield request
 
-    def parse(self, response):
-        """Parse all information to CarItem"""
-
+    def scrapy_link(self, response, links):
         ''' Extract the link '''
         link_items = response.xpath(
             '//*[contains(@id, "boxResultado")]/a/@href').extract()
 
-        links = []
         for l in link_items:
             try:
                 links.append(l)
@@ -67,6 +64,12 @@ class WebmotorsSpider(scrapy.Spider):
             except Exception as e:
                 print("URL {}, generic error : {}".format(response.url, e))
                 return
+
+    def parse(self, response):
+        """Parse all information to CarItem"""
+
+        links = []
+        self.scrapy_link(response, links)
 
         ''' Extract model and maker '''
         model_items = response.xpath(
@@ -184,6 +187,16 @@ class WebmotorsSpider(scrapy.Spider):
                 car['yearmaker'] = yearmakers[i]
                 # yearModel
                 car['km'] = kms[i]
+                # color
+                # version
+                # search
+                # searchoriginal
+                # idsite
+                # iduser
+                # contact_name
+                # contact_email
+                # contact_phone
+                # description
                 yield car
         else:
             error_message = ("Error with size of lists: prices={}, "

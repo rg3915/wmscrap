@@ -103,6 +103,21 @@ class WebmotorsSpider(scrapy.Spider):
                 print("URL {}, generic error : {}".format(response.url, e))
                 return
 
+    def scrapy_yearmaker(self, response, yearmakers):
+        ''' Extract yearMaker '''
+        yearmaker_tags = response.xpath(
+            '//*[contains(@class,"features")]/div[1]/span[1]/text()').extract()
+
+        for yearmaker in yearmaker_tags:
+            try:
+                yearmakers.append(yearmaker)
+            except ValueError as e:
+                print("URL {}, error : {}".format(response.url, e))
+                return
+            except Exception as e:
+                print("URL {}, generic error : {}".format(response.url, e))
+                return
+
     def scrapy_image(self, response, images):
         ''' Extract image '''
         image_tags = response.xpath(
@@ -154,20 +169,8 @@ class WebmotorsSpider(scrapy.Spider):
         cities = []
         self.scrapy_city(response, cities)
 
-        ''' Extract yearMaker '''
-        yearmaker_tags = response.xpath(
-            '//*[contains(@class,"features")]/div[1]/span[1]/text()').extract()
-
         yearmakers = []
-        for yearmaker in yearmaker_tags:
-            try:
-                yearmakers.append(yearmaker)
-            except ValueError as e:
-                print("URL {}, error : {}".format(response.url, e))
-                return
-            except Exception as e:
-                print("URL {}, generic error : {}".format(response.url, e))
-                return
+        self.scrapy_yearmaker(response, yearmakers)
 
         ''' Extract Km '''
         km_tags = response.xpath(

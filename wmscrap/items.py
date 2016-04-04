@@ -16,4 +16,5 @@ class CarItem(scrapy.Item):
     image = scrapy.Field()
     city = scrapy.Field()
     yearmaker = scrapy.Field()
+    color = scrapy.Field()
     km = scrapy.Field()

@@ -150,6 +150,21 @@ class WebmotorsSpider(scrapy.Spider):
                 print("URL {}, generic error : {}".format(response.url, e))
                 return
 
+    def scrapy_color(self, response, colors):
+        ''' Extract color '''
+        color_tags = response.xpath(
+            '//*[contains(@class,"features")]/div[1]/span[2]/text()').extract()
+
+        for color in color_tags:
+            try:
+                colors.append(color)
+            except ValueError as e:
+                print("URL {}, error : {}".format(response.url, e))
+                return
+            except Exception as e:
+                print("URL {}, generic error : {}".format(response.url, e))
+                return
+
     def scrapy_km(self, response, kms):
         ''' Extract Km '''
         km_tags = response.xpath(
@@ -187,6 +202,9 @@ class WebmotorsSpider(scrapy.Spider):
         yearmakers = []
         self.scrapy_yearmaker(response, yearmakers)
 
+        colors = []
+        self.scrapy_color(response, colors)
+
         kms = []
         self.scrapy_km(response, kms)
 
@@ -205,7 +223,7 @@ class WebmotorsSpider(scrapy.Spider):
                 car['yearmaker'] = yearmakers[i]
                 # yearModel
                 car['km'] = kms[i]
-                # color
+                car['color'] = colors[i]
                 # version
                 # search
                 # searchoriginal

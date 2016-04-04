@@ -119,6 +119,22 @@ class WebmotorsSpider(scrapy.Spider):
                 print("URL {}, generic error : {}".format(response.url, e))
                 return
 
+    def scrapy_city(self, response, cities):
+        ''' Extract city '''
+        city_tags = response.xpath(
+            '//*[contains(@class,"card-footer")]'
+            '/span[1]/text()').extract()
+
+        for city in city_tags:
+            try:
+                cities.append(city)
+            except ValueError as e:
+                print("URL {}, error : {}".format(response.url, e))
+                return
+            except Exception as e:
+                print("URL {}, generic error : {}".format(response.url, e))
+                return
+
     def parse(self, response):
         """Parse all information to CarItem"""
 
@@ -135,21 +151,8 @@ class WebmotorsSpider(scrapy.Spider):
         images = []
         self.scrapy_image(response, images)
 
-        ''' Extract city '''
-        city_tags = response.xpath(
-            '//*[contains(@class,"card-footer")]'
-            '/span[1]/text()').extract()
-
         cities = []
-        for city in city_tags:
-            try:
-                cities.append(city)
-            except ValueError as e:
-                print("URL {}, error : {}".format(response.url, e))
-                return
-            except Exception as e:
-                print("URL {}, generic error : {}".format(response.url, e))
-                return
+        self.scrapy_city(response, cities)
 
         ''' Extract yearMaker '''
         yearmaker_tags = response.xpath(

@@ -85,21 +85,11 @@ class WebmotorsSpider(scrapy.Spider):
                 print("URL {}, generic error : {}".format(response.url, e))
                 return
 
-    def parse(self, response):
-        """Parse all information to CarItem"""
-
-        links = []
-        self.scrapy_link(response, links)
-
-        makers = []
-        models = []
-        self.scrapy_makermodel(response, makers, models)
-
+    def scrapy_price(self, response, prices):
         ''' Extract price '''
         prices_items = response.xpath(
             '//*[contains(@class,"price")]/text()').extract()
 
-        prices = []
         for p in prices_items:
             try:
                 clean_price = p.strip()
@@ -112,6 +102,19 @@ class WebmotorsSpider(scrapy.Spider):
             except Exception as e:
                 print("URL {}, generic error : {}".format(response.url, e))
                 return
+
+    def parse(self, response):
+        """Parse all information to CarItem"""
+
+        links = []
+        self.scrapy_link(response, links)
+
+        makers = []
+        models = []
+        self.scrapy_makermodel(response, makers, models)
+
+        prices = []
+        self.scrapy_price(response, prices)
 
         ''' Extract image '''
         image_tags = response.xpath(

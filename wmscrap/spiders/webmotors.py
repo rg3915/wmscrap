@@ -139,6 +139,21 @@ class WebmotorsSpider(scrapy.Spider):
                 print("URL {}, generic error : {}".format(response.url, e))
                 return
 
+        ''' Extract yearBrand '''
+        yearbrand_tags = response.xpath(
+            '//*[contains(@class,"features")]/div[1]/span[1]/text()').extract()
+
+        yearbrands = []
+        for yearbrand in yearbrand_tags:
+            try:
+                yearbrands.append(yearbrand)
+            except ValueError as e:
+                print("URL {}, error : {}".format(response.url, e))
+                return
+            except Exception as e:
+                print("URL {}, generic error : {}".format(response.url, e))
+                return
+
         # If size of lists is not equal something wrong
         if len(prices) == len(models) == len(brands) == len(images):
             size = len(prices)
@@ -151,7 +166,7 @@ class WebmotorsSpider(scrapy.Spider):
                 car['image'] = images[i]
                 car['city'] = cities[i]
                 # state
-                # yearBrand
+                car['yearbrand'] = yearbrands[i]
                 # yearModel
                 # km
                 yield car

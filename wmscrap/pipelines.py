@@ -110,3 +110,30 @@ class RedisExportPipeline(object):
         )
         self.dict_to_redis_hset(hkey, item)
         return item
+
+DATABASE_HOST = "localhost"
+DATABASE_USER = "root"
+DATABASE_NAME = "webmotorsdb"
+DATABASE_PASSWD = "1234"
+DATABASE_PORT = 3306
+
+import MySQLdb
+
+
+# Connect to the Database
+db = MySQLdb.connect(
+    host=DATABASE_HOST,
+    user=DATABASE_USER,
+    passwd=DATABASE_PASSWD,
+    db=DATABASE_NAME,
+    port=int(DATABASE_PORT)
+)
+
+# Make the database cursor
+cursor = db.cursor()
+
+sql = "INSERT INTO ads () VALUES (%s, %s, %s, %s);"
+
+cursor.execute(sql % (
+    unicode(item['model'].encode('utf-8'), errors='ignore')
+))
